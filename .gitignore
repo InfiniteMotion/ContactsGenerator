@@ -1,0 +1,71 @@
+# Build results
+bin/
+obj/
+out/
+
+# IDE files
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Code coverage
+*.coverage
+*.coveragexml
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# Visual Studio
+*.vspscc
+*.vssscc
+*.vshost.*
+*.vstest.*
+
+# Rider
+*.lib
+*.exp
+*.pdb
+*.ilk
+
+# OS generated files
+Thumbs.db
+.DS_Store
+*.swp
+*.lock
+
+# Temporary files
+*.tmp
+*.temp
+~*
+*~
+
+# Log files
+*.log
+
+# NuGet
+packages/
+
+# Dotnet
+.project
+*.csproj.user
+*.csproj.orig
+
+# Avalonia
+*.axaml.cache
+
+# Backup files
+*.bak
+*.backup
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Trae IDE files
+.trae/

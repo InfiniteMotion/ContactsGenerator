@@ -1,0 +1,181 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ContactsGenerator.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="using:ContactsGenerator.Services"
+        xmlns:converters="using:Avalonia.Data.Converters"
+        xmlns:data="using:Avalonia.Controls"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="800"
+        x:Class="ContactsGenerator.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/logo.ico"
+        Title="联系人数据生成器"
+        Width="600" Height="800">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid Margin="20" RowDefinitions="Auto,Auto,Auto,Auto,*,Auto" ColumnDefinitions="*">
+        <!-- 标题区域 -->
+        <TextBlock Text="联系人数据生成器" 
+                   FontSize="28" 
+                   FontWeight="Bold" 
+                   HorizontalAlignment="Center" 
+                   Margin="0,0,0,20" 
+                   Grid.Row="0" />
+        
+        <!-- 控制面板 -->
+        <Border Grid.Row="1" 
+                BorderBrush="#CCCCCC" 
+                BorderThickness="1" 
+                CornerRadius="5" 
+                Padding="15" 
+                Margin="0,0,0,15">
+            <StackPanel Orientation="Vertical" Spacing="15">
+                <!-- 配置区域 -->
+                <TextBlock Text="配置选项" 
+                           FontSize="16" 
+                           FontWeight="Bold" 
+                           Margin="0,0,0,10" />
+                
+                <Grid ColumnDefinitions="Auto,Auto,10,Auto,Auto" RowDefinitions="Auto,Auto" HorizontalAlignment="Center" ColumnSpacing="15" RowSpacing="15">
+                    <TextBlock Text="联系人数量:" 
+                               VerticalAlignment="Center" 
+                               Grid.Row="0" Grid.Column="0" />
+                    <NumericUpDown Value="{Binding ContactCount}" 
+                                   Minimum="1" Maximum="1000" 
+                                   Width="120" 
+                                   Grid.Row="0" Grid.Column="1" />
+                    
+                    <TextBlock Text="语言:" 
+                               VerticalAlignment="Center" 
+                               Grid.Row="0" Grid.Column="3" />
+                    <ComboBox ItemsSource="{Binding Languages}" 
+                              SelectedItem="{Binding SelectedLanguage}" 
+                              Width="120" 
+                              Grid.Row="0" Grid.Column="4" />
+                    
+                    <TextBlock Text="VCARD版本:" 
+                               VerticalAlignment="Center" 
+                               Grid.Row="1" Grid.Column="0" />
+                    <ComboBox ItemsSource="{Binding Versions}" 
+                              SelectedItem="{Binding SelectedVersion}" 
+                              Width="120" 
+                               Grid.Row="1" Grid.Column="1" />
+                </Grid>
+            </StackPanel>
+        </Border>
+        
+        <!-- 按钮区域 -->
+        <Border Grid.Row="2" 
+                BorderBrush="#CCCCCC" 
+                BorderThickness="1" 
+                CornerRadius="5" 
+                Padding="10" 
+                Margin="0,0,0,15">
+            <StackPanel Orientation="Horizontal" 
+                        Spacing="15" 
+                        HorizontalAlignment="Center">
+                <Button Command="{Binding GenerateContactsCommand}" 
+                        Content="生成联系人" 
+                        Width="120" 
+                        Height="35" 
+                        IsEnabled="{Binding !IsGenerating}">
+                    <Button.Styles>
+                        <Style Selector="Button">
+                            <Setter Property="Background" Value="#4CAF50" />
+                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="FontWeight" Value="Bold" />
+                            <Setter Property="FontSize" Value="14" />
+                        </Style>
+                    </Button.Styles>
+                </Button>
+                <Button Command="{Binding ExportContactsCommand}" 
+                        Content="导出联系人" 
+                        Width="120" 
+                        Height="35">
+                    <Button.Styles>
+                        <Style Selector="Button">
+                            <Setter Property="Background" Value="#2196F3" />
+                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="FontWeight" Value="Bold" />
+                            <Setter Property="FontSize" Value="14" />
+                        </Style>
+                    </Button.Styles>
+                </Button>
+            </StackPanel>
+        </Border>
+        
+        <!-- 加载指示器 -->
+        <Border Grid.Row="3" 
+                BorderBrush="#CCCCCC" 
+                BorderThickness="1" 
+                CornerRadius="5" 
+                Padding="10" 
+                Margin="0,0,0,15"
+                IsVisible="{Binding IsGenerating}">
+            <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Center">
+                <ProgressBar IsIndeterminate="True" 
+                             Width="200" 
+                             Height="20" />
+                <TextBlock Text="正在生成..." 
+                           Margin="10,0,0,0" 
+                           VerticalAlignment="Center" />
+            </StackPanel>
+        </Border>
+        
+        <!-- 联系人列表 -->
+        <Border Grid.Row="4" 
+                BorderBrush="#CCCCCC" 
+                BorderThickness="1" 
+                CornerRadius="5" 
+                Padding="10">
+            <!-- 使用ScrollViewer包装联系人预览区域 -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="{Binding Contacts.Count, StringFormat='联系人数量: {0}'}" 
+                               Margin="0,0,0,10" 
+                               FontWeight="Bold" />
+                    <!-- 添加一个测试列表来显示联系人详情 -->
+                    <ItemsControl ItemsSource="{Binding Contacts}" Margin="0,0,0,10">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                    <TextBlock Text="{Binding FullName}" Margin="0,0,10,0" />
+                                    <TextBlock Text="{Binding PhoneNumber}" Margin="0,0,10,0" />
+                                    <TextBlock Text="{Binding Email}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <!-- 使用自动生成列的DataGrid -->
+                    <data:DataGrid ItemsSource="{Binding Contacts}" 
+                              AutoGenerateColumns="True" 
+                              CanUserSortColumns="True" 
+                              Margin="0,0,0,10"
+                              IsReadOnly="True"
+                              SelectionMode="Single" />
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+        
+        <!-- 状态栏 -->
+        <Border Grid.Row="5" 
+                BorderBrush="#CCCCCC" 
+                BorderThickness="1" 
+                CornerRadius="3" 
+                Padding="10" 
+                Margin="0,10,0,0">
+            <TextBlock Text="{Binding StatusMessage}" 
+                       VerticalAlignment="Center" 
+                       HorizontalAlignment="Left" 
+                       FontWeight="SemiBold" />
+        </Border>
+    </Grid>
+
+</Window>
